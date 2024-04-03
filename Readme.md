@@ -12,7 +12,6 @@
 
 ### 2023-03-17
 - Added the ability to train the model on custom datasets. 
-- Added the HDR AQ model. The program to obtain the VIF and DLM features after nonlinear transform. This implementation assumes that the input video is in YUV420p10le format, and are 3840x2160 pixels.
 
 ## HDR-VMAF
 This is the code implementation of the HDR-VMAF, HDR MS-SSIM and HDR-SSIM mentioned in the paper "Making Video Quality Assessment Models Robust to Bit Depth". This implementation has three models, the HDR-VMAF, HDR MS-SSIM and HDR-SSIM model. All of them are full reference HDR VQA models. 

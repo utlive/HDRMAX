@@ -1,0 +1,14 @@
+scikit-image
+matplotlib
+joblib
+scipy
+numpy
+pyarrow
+pandas
+colour-science
+argparse
+PyWavelets
+pyrtools
+scikit-video
+scikit-learn==1.1.0
+opencv-python

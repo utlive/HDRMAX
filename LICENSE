@@ -23,8 +23,6 @@ The following papers are to be cited in the bibliography whenever the software i
 -Z. Shang, J. P. Ebenezer, A. C. Bovik, Y. Wu, H. Wei, and S. Sethu- raman, “Subjective assessment of high dynamic range videos under different ambient conditions,” in 2022 IEEE International Conference on Image Processing (ICIP), 2022
 
 -J. P. Ebenezer, Z. Shang, Y. Wu, H. Wei, S. Sethuraman and A. C. Bovik, "Making Video Quality Assessment Models Robust to Bit Depth," in IEEE Signal Processing Letters, vol. 30, pp. 488-492, 2023, doi: 10.1109/LSP.2023.3268602.
-keywords: {Databases;Feature extraction;Predictive models;Prediction algorithms;Nonlinear distortion;Dynamic range;Standards;High dynamic range;video quality assessment},
 
 -Z. Shang et al., "A Study of Subjective and Objective Quality Assessment of HDR Videos," in IEEE Transactions on Image Processing, vol. 33, pp. 42-57, 2024, doi: 10.1109/TIP.2023.3333217.
-keywords: {Videos;Databases;Image color analysis;Standards;Quality assessment;Data models;Image coding;High dynamic range (HDR);video quality assessment (VQA);HDR VQA database;HDRMAX;full reference (FR) models},
 

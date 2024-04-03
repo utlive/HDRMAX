@@ -21,7 +21,7 @@ This is the code implementation of the HDR-VMAF, HDR MS-SSIM and HDR-SSIM mentio
 ---
 
 **Python Version Requirement:**
-This project requires Python version 3.9. This is due to certain dependencies in the `requirements.txt` file which are not compatible with later versions of Python.
+This project requires Python version 3.9-3.10. This is due to certain dependencies in the `requirements.txt` file which are not compatible with later versions of Python.
 
 **Installing Dependencies:**
 To install the required packages, use the following command:

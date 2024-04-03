@@ -160,5 +160,6 @@ The following papers are to be cited in the bibliography whenever the software i
 -J. P. Ebenezer, Z. Shang, Y. Wu, H. Wei, S. Sethuraman and A. C. Bovik, "Making Video Quality Assessment Models Robust to Bit Depth," in IEEE Signal Processing Letters, vol. 30, pp. 488-492, 2023, doi: 10.1109/LSP.2023.3268602.
 
 -Z. Shang et al., "A Study of Subjective and Objective Quality Assessment of HDR Videos," in IEEE Transactions on Image Processing, vol. 33, pp. 42-57, 2024, doi: 10.1109/TIP.2023.3333217.
+
 -----------COPYRIGHT NOTICE ENDS WITH THIS LINE------------
 

@@ -130,3 +130,35 @@ The `predict.py` script uses the extracted features and trained models to predic
 
 
 Please contact Zaixi Shang (zxshang@utexas.edu) if you have any questions.
+
+-----------COPYRIGHT NOTICE STARTS WITH THIS LINE------------
+
+Copyright (c) 2024 Laboratory for Image and Video Engineering (LIVE)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+The following papers are to be cited in the bibliography whenever the software is used as:
+
+-Z. Shang, J. P. Ebenezer, A. C. Bovik, Y. Wu, H. Wei, and S. Sethu- raman, “Subjective assessment of high dynamic range videos under different ambient conditions,” in 2022 IEEE International Conference on Image Processing (ICIP), 2022
+
+-J. P. Ebenezer, Z. Shang, Y. Wu, H. Wei, S. Sethuraman and A. C. Bovik, "Making Video Quality Assessment Models Robust to Bit Depth," in IEEE Signal Processing Letters, vol. 30, pp. 488-492, 2023, doi: 10.1109/LSP.2023.3268602.
+
+-Z. Shang et al., "A Study of Subjective and Objective Quality Assessment of HDR Videos," in IEEE Transactions on Image Processing, vol. 33, pp. 42-57, 2024, doi: 10.1109/TIP.2023.3333217.
+-----------COPYRIGHT NOTICE ENDS WITH THIS LINE------------
+

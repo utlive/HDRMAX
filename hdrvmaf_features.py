@@ -67,10 +67,22 @@ def m_exp(image):
     
     maxY = scipy.ndimage.maximum_filter(Y, size=(17, 17, 1))
     minY = scipy.ndimage.minimum_filter(Y, size=(17, 17, 1))
-    Y_scaled = -1+(Y-minY) * 2/(1e-3+maxY-minY)
+    
+    # Handle numerical stability as per original paper requirements
+    diff = maxY - minY
+    # Set Y_scaled to 0 where MAX=MIN or difference is too small (< 10^-3)
+    mask = diff < 1e-3
+    
+    # Linear mapping from [minY, maxY] to [-1, 1]
+    # MAX maps to +1, MIN maps to -1
+    Y_scaled = -1 + (Y - minY) * 2 / diff
+    
+    # Set to 0 where diff is too small to avoid numerical issues
+    Y_scaled[mask] = 0
+    
     Y_transform = np.exp(np.abs(Y_scaled)*4)-1
     Y_transform[Y_scaled < 0] = -Y_transform[Y_scaled < 0]
-    Y_transform  = Y_transform.squeeze()
+    Y_transform = Y_transform.squeeze()
     return Y_transform
 
 def global_m_exp(Y,delta):

@@ -1,32 +1,15 @@
-from skimage.util.shape import view_as_blocks
-from skimage import filters
-import matplotlib.pyplot as plt
-from joblib import dump,Parallel,delayed
-from scipy.stats import gmean
-import time
-from scipy.ndimage import gaussian_filter
+from joblib import Parallel,delayed
+import scipy.ndimage
 from utils.hdr_utils import hdr_yuv_read
-from utils.csf_utils import csf_barten_frequency,csf_filter_block,blockwise_csf,windows_csf
+from ssim_features import structural_similarity_features as ssim_features
 import numpy as np
-import glob
 import pandas as pd
 import os
-from os.path import  join
-import scipy
+from os.path import join
 import colour
-import socket
-import sys
 import argparse
 from datetime import datetime
 import warnings
-from ssim_features import structural_similarity_features as ssim_features
-
-def global_exp(image,par):
-
-    assert len(np.shape(image)) == 2
-    avg = np.average(image)
-    y = np.exp(par*(image-avg))
-    return y
 
 def gen_gauss_window(lw, sigma):
     sd = np.float32(sigma)
@@ -44,39 +27,6 @@ def gen_gauss_window(lw, sigma):
         weights[ii] /= sum
     return weights
 
-def local_exp(image,par,patch_size):
-    assert len(np.shape(image)) == 2
-    h, w = np.shape(image)
-
-    avg_window = gen_gauss_window(patch_size//2, 7.0/6.0)
-    mu_image = np.zeros((h, w), dtype=np.float32)
-    image = np.array(image).astype('float32')
-    scipy.ndimage.correlate1d(image, avg_window, 0, mu_image, mode='constant')
-    scipy.ndimage.correlate1d(mu_image, avg_window, 1, mu_image, mode='constant')
-    y = np.exp(par*(image - mu_image))
-    return y
-    
-
-def logit(Y,par):
-    
-    maxY = scipy.ndimage.maximum_filter(Y,size=(31,31))
-    minY = scipy.ndimage.minimum_filter(Y,size=(31,31))
-    delta = par
-    Y_scaled = -0.99+1.98*(Y-minY)/(1e-3+maxY-minY)
-    Y_transform = np.log((1+(Y_scaled)**delta)/(1-(Y_scaled)**delta))
-    if(delta%2==0):
-        Y_transform[Y<0] = -Y_transform[Y<0] 
-    return Y_transform
-
-def global_logit(Y,par):
-    delta = par
-    Y_scaled = -0.99+1.98*(Y-np.amin(Y))/(1e-3+np.amax(Y)-np.amin(Y))
-    Y_transform = np.log((1+(Y_scaled)**delta)/(1-(Y_scaled)**delta))
-    if(delta%2==0):
-        Y_transform[Y<0] = -Y_transform[Y<0] 
-    return Y_transform
-
-
 def ssim_refall_wrapper(ind):
     dis_f = files[ind]
     ref_f = ref_names[ind]
@@ -84,9 +34,6 @@ def ssim_refall_wrapper(ind):
     dis_f = os.path.join(vid_pth,dis_f)
     ref_f = os.path.join(vid_pth,ref_f)
     ssim_video_wrapper(ref_f,dis_f,ind)
-    
-
-
 
 def msssim(frame1, frame2, method='product'):
     feats = []
@@ -155,33 +102,34 @@ def ssim_video_wrapper(ref_f,dis_f,dis_index):
     current_time = now.strftime("%H:%M:%S")
     print("Current Time =", current_time)
 def ssim_image_wrapper(ref_f,dis_f,start,end,h,w,space, channel ,ind):
-    ref_file_object = open(ref_f)
-    dis_file_object = open(dis_f)
+    # Constants definition
+    COLOR_DEPTH_MAX = 1023  # 10-bit color depth maximum value
     
-    framelist =  list(range(start,end,int(fps[ind])))
-    print(f'Extracting frames  from {start} to {end}')
-    dis_name = os.path.splitext(os.path.basename(dis_f))[0]
-    output_csv_ssim = os.path.join(out_pth_ssim, dis_name+'.csv')
-    ssim_feats = []
-    for framenum in framelist:
-        try:
-            ref_multichannel = hdr_yuv_read(ref_file_object,framenum,h,w)
-            dis_multichannel = hdr_yuv_read(dis_file_object,framenum,h,w)
-
-        except Exception as e:
-            print(e)
-            break
+    with open(ref_f, 'rb') as ref_file_object, open(dis_f, 'rb') as dis_file_object:
+        framelist = list(range(start,end,int(fps[ind])))
+        print(f'Extracting frames from {start} to {end}')
+        dis_name = os.path.splitext(os.path.basename(dis_f))[0]
+        output_csv_ssim = os.path.join(out_pth_ssim, dis_name+'.csv')
+        ssim_feats = []
         
-        if (space == 'ycbcr'):
-           
-            ref_multichannel = [i.astype(np.float64)/1023 for i in ref_multichannel]
-            dis_multichannel = [i.astype(np.float64)/1023 for i in dis_multichannel]
-        elif(space == 'lab'):
-            #first convert to 0-1 scale for the conversion
+        for framenum in framelist:
+            try:
+                ref_multichannel = hdr_yuv_read(ref_file_object,framenum,h,w)
+                dis_multichannel = hdr_yuv_read(dis_file_object,framenum,h,w)
+            except Exception as e:
+                print(f"Error reading frame {framenum}: {e}")
+                break
+            
+            if (space == 'ycbcr'):
+                ref_multichannel = [i.astype(np.float64)/COLOR_DEPTH_MAX for i in ref_multichannel]
+                dis_multichannel = [i.astype(np.float64)/COLOR_DEPTH_MAX for i in dis_multichannel]
+            elif(space == 'lab'):
+                # Convert to 0-1 scale for the conversion
                 ref_multichannel = np.stack(ref_multichannel,axis = 2)
                 dis_multichannel = np.stack(dis_multichannel,axis = 2)
-                ref_multichannel = ref_multichannel.astype(np.float64)/1023
-                dis_multichannel = dis_multichannel.astype(np.float64)/1023
+                ref_multichannel = ref_multichannel.astype(np.float64)/COLOR_DEPTH_MAX
+                dis_multichannel = dis_multichannel.astype(np.float64)/COLOR_DEPTH_MAX
+                
                 frame = colour.YCbCr_to_RGB(ref_multichannel,K = [0.2627,0.0593])
                 xyz = colour.RGB_to_XYZ(frame, [0.3127,0.3290], [0.3127,0.3290], 
                 colour.models.RGB_COLOURSPACE_BT2020.RGB_to_XYZ_matrix, 
@@ -189,6 +137,7 @@ def ssim_image_wrapper(ref_f,dis_f,start,end,h,w,space, channel ,ind):
                 cctf_decoding=colour.models.eotf_PQ_BT2100)/10000
                 lab = colour.XYZ_to_hdr_CIELab(xyz, illuminant=[ 0.3127, 0.329 ], Y_s=0.2, Y_abs=100, method='Fairchild 2011')
                 ref_multichannel = lab
+                
                 frame = colour.YCbCr_to_RGB(dis_multichannel,K = [0.2627,0.0593])
                 xyz = colour.RGB_to_XYZ(frame, [0.3127,0.3290], [0.3127,0.3290], 
                 colour.models.RGB_COLOURSPACE_BT2020.RGB_to_XYZ_matrix, 
@@ -196,20 +145,21 @@ def ssim_image_wrapper(ref_f,dis_f,start,end,h,w,space, channel ,ind):
                 cctf_decoding=colour.models.eotf_PQ_BT2100)/10000
                 lab = colour.XYZ_to_hdr_CIELab(xyz, illuminant=[ 0.3127, 0.329 ], Y_s=0.2, Y_abs=100, method='Fairchild 2011')
                 dis_multichannel = lab
+                
                 ref_multichannel = ref_multichannel.transpose(2,0,1)
                 dis_multichannel = dis_multichannel.transpose(2,0,1)
-         
 
-        ref_singlechannel = ref_multichannel[channel]
-        dis_singlechannel = dis_multichannel[channel]       
-        ssim_feat = msssim(ref_singlechannel, dis_singlechannel)
-        ssim_feats.append(ssim_feat)
-    ssim_feats = np.array(ssim_feats)
-    # average over the frames
-    ssim_feats = np.mean(ssim_feats, axis=0)
-    # create a dataframe and save it
-    df = pd.DataFrame(ssim_feats.reshape(1, -1))
-    df.to_csv(output_csv_ssim, index=False)
+            ref_singlechannel = ref_multichannel[channel]
+            dis_singlechannel = dis_multichannel[channel]       
+            ssim_feat = msssim(ref_singlechannel, dis_singlechannel)
+            ssim_feats.append(ssim_feat)
+            
+        ssim_feats = np.array(ssim_feats)
+        # average over the frames
+        ssim_feats = np.mean(ssim_feats, axis=0)
+        # create a dataframe and save it
+        df = pd.DataFrame(ssim_feats.reshape(1, -1))
+        df.to_csv(output_csv_ssim, index=False)
 
 
 

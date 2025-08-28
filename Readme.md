@@ -1,9 +1,15 @@
 ## Change Log
+### 2025-08-27
+- Fixed numerical stability issues in m_exp function
+- Added comprehensive .gitignore file for Python projects
+- Updated README with nonlinear transformation explanation and HDR-ChipQA paper reference
+- Improved code documentation and comments
+
 ### 2024-03-19
-- Changed feature extraction, main, and prediction code. The current version calculates the score using the HDRMAX single nonlienar. The model files are also retrained. 
+- Changed feature extraction, main, and prediction code. The current version calculates the score using the HDRMAX single nonlienar (`local_m_exp`). The model files are also retrained.
 
 ### 2024-03-05
-- Changed the code to remove extra computation. The program now should be much faster. 
+- Changed the code to remove extra computation. The program now should be much faster.
 
 
 ### 2023-04-20
@@ -14,7 +20,10 @@
 - Added the ability to train the model on custom datasets. 
 
 ## HDR-VMAF
-This is the code implementation of the HDR-VMAF, HDR MS-SSIM and HDR-SSIM mentioned in the paper "Making Video Quality Assessment Models Robust to Bit Depth". This implementation has three models, the HDR-VMAF, HDR MS-SSIM and HDR-SSIM model. All of them are full reference HDR VQA models. 
+This is the code implementation of the HDR-VMAF, HDR MS-SSIM and HDR-SSIM mentioned in the paper "Making Video Quality Assessment Models Robust to Bit Depth". This implementation has three models, the HDR-VMAF, HDR MS-SSIM and HDR-SSIM model. All of them are full reference HDR VQA models.
+
+### Nonlinear Transformation
+HDRMAX employs the local expansive nonlinearity technique from the HDR-ChipQA paper by Ebenezer et al.* This approach addresses the challenge that HDR-specific distortions at brightness/color extremes are often masked by features computed on standard dynamic range regions. The method applies an expansive nonlinearity `f(y) = exp(|y|×4) - 1` on locally normalized pixel values (17×17 windows mapped to [-1,1]), which expands extreme brightness ranges while compressing mid-ranges. This transformation enables better detection of distortions in very bright and dark regions that are critical for HDR video quality assessment.
 
 ### Requirements
 ---
@@ -155,11 +164,12 @@ SOFTWARE.
 
 The following papers are to be cited in the bibliography whenever the software is used as:
 
--Z. Shang, J. P. Ebenezer, A. C. Bovik, Y. Wu, H. Wei, and S. Sethu- raman, “Subjective assessment of high dynamic range videos under different ambient conditions,” in 2022 IEEE International Conference on Image Processing (ICIP), 2022
+-Z. Shang, J. P. Ebenezer, A. C. Bovik, Y. Wu, H. Wei, and S. Sethu- raman, "Subjective assessment of high dynamic range videos under different ambient conditions," in 2022 IEEE International Conference on Image Processing (ICIP), 2022
 
 -J. P. Ebenezer, Z. Shang, Y. Wu, H. Wei, S. Sethuraman and A. C. Bovik, "Making Video Quality Assessment Models Robust to Bit Depth," in IEEE Signal Processing Letters, vol. 30, pp. 488-492, 2023, doi: 10.1109/LSP.2023.3268602.
 
 -Z. Shang et al., "A Study of Subjective and Objective Quality Assessment of HDR Videos," in IEEE Transactions on Image Processing, vol. 33, pp. 42-57, 2024, doi: 10.1109/TIP.2023.3333217.
 
------------COPYRIGHT NOTICE ENDS WITH THIS LINE------------
+-*J. P. Ebenezer, Z. Shang, Y. Wu, H. Wei, S. Sethuraman and A. C. Bovik, "HDR-ChipQA: No-reference quality assessment on High Dynamic Range videos," Signal Processing: Image Communication, vol. 129, pp. 117191, 2024, doi: 10.1016/j.image.2024.117191.
 
+-----------COPYRIGHT NOTICE ENDS WITH THIS LINE------------

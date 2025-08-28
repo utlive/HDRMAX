@@ -57,19 +57,6 @@ def local_exp(image,par,patch_size):
     return y
     
 
-def m_exp(image,par,patch_size = 31):
-    maxY = scipy.ndimage.maximum_filter(image,size=(patch_size,patch_size))
-    minY = scipy.ndimage.minimum_filter(image,size=(patch_size,patch_size))
-    image = -4+(image-minY)* 8/(1e-3+maxY-minY)
-    Y_transform =  np.exp(np.abs(image)**par)-1
-    Y_transform[image<0] = -Y_transform[image<0]
-    return Y_transform
-
-def global_m_exp(Y,delta):
-    Y = -4+(Y-np.amin(Y))* 8/(1e-3+np.amax(Y)-np.amin(Y))
-    Y_transform =  np.exp(np.abs(Y)**delta)-1
-    Y_transform[Y<0] = -Y_transform[Y<0]
-    return Y_transform
 def logit(Y,par):
     
     maxY = scipy.ndimage.maximum_filter(Y,size=(31,31))

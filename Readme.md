@@ -1,4 +1,9 @@
 ## Change Log
+### 2025-09-06
+- Refactored code, moved feature extraction functions to feature_utils.py
+- Added SSIM and MS-SSIM feature extraction functions
+- Created unified prediction script predict_unified.py, supporting VMAF, SSIM, and MS-SSIM models
+
 ### 2025-08-27
 - Fixed numerical stability issues in m_exp function
 - Added comprehensive .gitignore file for Python projects
@@ -20,7 +25,7 @@
 - Added the ability to train the model on custom datasets. 
 
 ## HDR-VMAF
-This is the code implementation of the HDR-VMAF, HDR MS-SSIM and HDR-SSIM mentioned in the paper "Making Video Quality Assessment Models Robust to Bit Depth". This implementation has three models, the HDR-VMAF, HDR MS-SSIM and HDR-SSIM model. All of them are full reference HDR VQA models.
+This is the code implementation of the HDR-VMAF, HDR MS-SSIM and HDR-SSIM mentioned in the paper. This implementation has three models, the HDR-VMAF, HDR MS-SSIM and HDR-SSIM model. All of them are full reference HDR VQA models.
 
 ### Nonlinear Transformation
 HDRMAX employs the local expansive nonlinearity technique from the HDR-ChipQA paper by Ebenezer et al.* This approach addresses the challenge that HDR-specific distortions at brightness/color extremes are often masked by features computed on standard dynamic range regions. The method applies an expansive nonlinearity `f(y) = exp(|y|×4) - 1` on locally normalized pixel values (17×17 windows mapped to [-1,1]), which expands extreme brightness ranges while compressing mid-ranges. This transformation enables better detection of distortions in very bright and dark regions that are critical for HDR video quality assessment.
@@ -51,7 +56,7 @@ sudo apt-get install libgl1-mesa-glx
 It is recommended to use the `main.py`. 
 
 ```
-usage: main.py [-h] --input INPUT --output OUTPUT --csvpth CSVPTH [--njobs NJOBS] --frame_range FRAME_RANGE {hdrvmaf,ssim-hdrmax,msssim-hdrmax}
+usage: main.py [-h] {hdrvmaf,ssim-hdrmax,msssim-hdrmax} --input INPUT --output OUTPUT --csvpth CSVPTH [--njobs NJOBS] --frame_range FRAME_RANGE
 
 positional arguments:
   {hdrvmaf,ssim-hdrmax,msssim-hdrmax}
@@ -65,7 +70,6 @@ optional arguments:
   --njobs NJOBS         Number of jobs
   --frame_range FRAME_RANGE
                         Frame range
-  --mode 
 ```
 
 Here `INPUT` is the path to the source videos, the yuv files, they need to have the resolutions 3840*2160. `OUTPUT` can be an empty folder for the output features, `CSVPTH` is the csv file that includes the yuv file names of the input files, fps, and the original width and hight of the video, and the start frame index and end frame index if the `FRAME_RANGE` parameter is set to `file`. See info.csv for an example. `njob` is the number of jobs runing.
@@ -112,31 +116,73 @@ For example:
 
 ## Train on a Custom Dataset
 
-To train the model on a custom dataset, follow these steps:
+To train the model on a custom dataset, you can use one of the three training scripts depending on which model you want to train:
 
-1. Extract the features from your custom dataset as described in the previous section.
-2. Run the `train_model.py` script with the appropriate arguments.
+### 1. Training VMAF Model
 
-The script accepts the following arguments:
+Use the `train_model.py` script to train the VMAF model:
+
+```
+python train_model.py feature_path score_csv [--scaler_name SCALER_NAME] [--svr_name SVR_NAME]
+```
+
+### 2. Training SSIM Model
+
+Use the `train_modelssim.py` script to train the SSIM model:
+
+```
+python train_modelssim.py feature_path score_csv [--scaler_name SCALER_NAME] [--svr_name SVR_NAME]
+```
+
+### 3. Training MS-SSIM Model
+
+Use the `train_modelmsssim.py` script to train the MS-SSIM model:
+
+```
+python train_modelmsssim.py feature_path score_csv [--scaler_name SCALER_NAME] [--svr_name SVR_NAME]
+```
+
+All three scripts accept the following arguments:
 
 - `feature_path`: Path to the folder containing the features extracted from your custom dataset.
 - `score_csv`: Path to the score file. This should be a CSV file with the following columns: video, score, content. It is critical that the video column has the same name as the video files in the feature folder.
 - `--scaler_name` (optional): The name of the Scaler. Defaults to 'model_scaler.pkl'.
 - `--svr_name` (optional): The name of the SVR. Defaults to 'model_svr.pkl'.
 
-
+For example, to train the SSIM model:
+```
+python train_modelssim.py ./features-test-ssim score_file.csv --scaler_name models/scaler/ssim_scaler.pkl --svr_name models/svr/ssim_svr.pkl
+```
 
 ## Predict Quality Scores for Videos
 
-The `predict.py` script uses the extracted features and trained models to predict quality scores for each video. To run the script, you'll need to provide the following arguments:
+The `predict_unified.py` script uses the extracted features and trained models to predict quality scores for videos. This unified script supports all three model types: VMAF, SSIM, and MS-SSIM.
 
+```
+python predict_unified.py feature_path output_name --model MODEL
+```
+
+Arguments:
 - `feature_path`: Path to the folder containing the features extracted from the videos.
-- `output_name`: Name of the output file where the predictions will be saved, defaults to 'predict.csv'.
-- `--model` (optional): Which model to use. Options: LIVEHDR, LIVEAQ, CUSTOM. Defaults to 'LIVEHDR'. The HDRAQ model is trained on the UTA spring dataset. The HDRLIVE model is trained on the UTA 2021 fall dataset.
-- `--svr_name` (optional): SVR name, to be used with the CUSTOM model.
-- `--scaler_name` (optional): Scaler name, to be used with the CUSTOM model.
+- `output_name`: Name of the output file where the predictions will be saved.
+- `--model`: Which model to use. Options: VMAF, SSIM, MSSSIM. Default is 'VMAF'.
 
+Examples:
 
+1. Using VMAF model:
+```
+python predict_unified.py ./features-test out_vmaf.csv --model VMAF
+```
+
+2. Using SSIM model:
+```
+python predict_unified.py ./features-test-ssim out_ssim.csv --model SSIM
+```
+
+3. Using MS-SSIM model:
+```
+python predict_unified.py ./features-test-msssim out_msssim.csv --model MSSSIM
+```
 
 Please contact Zaixi Shang (zxshang@utexas.edu) if you have any questions.
 

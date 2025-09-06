@@ -75,10 +75,11 @@ def m_exp(image):
     
     # Linear mapping from [minY, maxY] to [-1, 1]
     # MAX maps to +1, MIN maps to -1
-    Y_scaled = -1 + (Y - minY) * 2 / diff
+    # Use np.divide with where parameter to avoid division by zero
+    Y_scaled = np.zeros_like(Y)
+    Y_scaled[~mask] = -1 + (Y[~mask] - minY[~mask]) * 2 / diff[~mask]
     
-    # Set to 0 where diff is too small to avoid numerical issues
-    Y_scaled[mask] = 0
+    # mask already handled by only computing values where ~mask
     
     Y_transform = np.exp(np.abs(Y_scaled)*4)-1
     Y_transform[Y_scaled < 0] = -Y_transform[Y_scaled < 0]

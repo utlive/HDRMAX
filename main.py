@@ -17,19 +17,19 @@ def main(args):
         commands = [
             f"python hdrvmaf_features.py {input} {output} {csvpth} --space ycbcr --nonlinear local_m_exp  --channel 0 --vif --dlm --njobs {njobs} --frame_range {frame_range}",
             f"python hdrvmaf_features.py {input} {output} {csvpth} --space ycbcr --nonlinear none --parameter 2 --channel 0 --vif --dlm --njobs {njobs} --frame_range {frame_range}",
-            f"python predict.py {output} out.csv"
+            f"python predict_unified.py {output} out.csv --model VMAF"
         ]
     elif args.mode == 'ssim-hdrmax':
         commands = [
             f"python hdrvmaf_features.py {input} {output} {csvpth} --space ycbcr --nonlinear local_m_exp --channel 0 --vif --dlm --njobs {njobs} --frame_range {frame_range}",
             f"python extract_ssim.py {input} {output} {csvpth} --space ycbcr  --channel 0 --njobs {njobs} --frame_range {frame_range}",
-            f"python predict_hdrssim.py {output} out.csv",
+            f"python predict_unified.py {output} out.csv --model SSIM",
         ]
     elif args.mode == 'msssim-hdrmax':
         commands = [
             f"python hdrvmaf_features.py {input} {output} {csvpth} --space ycbcr --nonlinear local_m_exp --channel 0 --vif --dlm --njobs {njobs} --frame_range {frame_range}",
             f"python extract_msssim.py {input} {output} {csvpth} --space ycbcr  --channel 0 --njobs {njobs} --frame_range {frame_range}",
-            f"python predict_hdrmsssim.py {output} out.csv",
+            f"python predict_unified.py {output} out.csv --model MSSSIM",
         ]
     else:
         raise ValueError(f"Unsupported mode: {args.mode}")

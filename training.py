@@ -69,6 +69,7 @@ def train_for_srocc_svr(train, scaler_name, svr_name):
 
     train, kfs = generatekfs(train)
     X_train = train.drop(['video', 'score', 'content'], axis=1)
+    X_train.columns = X_train.columns.astype(str)
     y_train = train['score']
     scaler = StandardScaler()
     scaler.fit(X_train)

@@ -51,6 +51,20 @@ sudo apt-get install libgl1-mesa-glx
 ```
 
 ---
+
+### Dataset and Video Requirements
+
+The subjective study for the HDRMAX database was conducted in a laboratory environment using 4K content (3840 x 2160 resolution). Therefore, **all videos** (regardless of their original resolution) must be upscaled to **3840 x 2160** resolution for both test videos (distorted) and reference videos when performing quality assessment.
+
+You can use the provided script `scripts/dump_yuv.sh` to convert video files to the required YUV format and upscale them to the correct resolution:
+
+```bash
+./scripts/dump_yuv.sh <inputfile.mp4>
+```
+
+This script uses ffmpeg to upscale the input video to 3840x2160 resolution and convert it to yuv420p10le pixel format.
+
+---
 ### Usage
 
 It is recommended to use the `main.py`. 
